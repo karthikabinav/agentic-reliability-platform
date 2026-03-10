@@ -2,18 +2,18 @@
 
 Date: 2026-03-10
 Project: agentic-reliability-platform
-Suite: core25 (initial scaffold subset currently 5 tasks)
+Suite: core25 (25-task canonical pack)
 
 ## Executive summary
 - Initial ARK runner scaffold is live.
 - Local suite execution now emits:
   - `traces.jsonl`
   - `summary.json`
-- Current seeded baseline (scaffold subset):
-  - Task count: 5
-  - Passed: 3
-  - Failed: 2
-  - Reliability@K: 0.60
+- Current seeded baseline:
+  - Task count: 25
+  - Passed: 17
+  - Failed: 8
+  - Reliability@K: 0.68
 
 ## Top observed failure modes (seeded in scaffold)
 - retry_exhaustion
@@ -33,5 +33,4 @@ cat ./artifacts/core25-baseline/summary.json
 ```
 
 ## Notes
-- This is a Day-1 scaffold snapshot for velocity.
-- Core25 will be expanded from 5 -> 25 canonical tasks in Week 1.
+- This is a Day-1 velocity snapshot with the full Core25 pack enabled.
