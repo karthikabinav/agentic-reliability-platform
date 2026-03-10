@@ -9,6 +9,9 @@ dependencies = [
   "pydantic>=2.8.0"
 ]
 
+[project.scripts]
+ark = "app.ark.cli:main"
+
 [project.optional-dependencies]
 dev = ["pytest>=8.2.0", "httpx>=0.27.0"]
 

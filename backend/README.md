@@ -22,6 +22,15 @@ uvicorn app.main:app --reload --port 8020
 - Quick showcase: `../demo/README.md`
 - Script: `../demo/run_demo.sh`
 
+## ARK Runner (new)
+Run a local reliability suite and generate artifacts:
+```bash
+ark run --suite core25 --model openrouter/auto --out ./artifacts/core25
+```
+Outputs:
+- `traces.jsonl` (step-level telemetry)
+- `summary.json` (Reliability@K summary)
+
 ## Notes
 - SQLite default for MVP.
 - Replay endpoint is a queued stub in P0 (real worker in P1).

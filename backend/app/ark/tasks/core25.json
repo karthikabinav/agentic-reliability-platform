@@ -1,0 +1,41 @@
+{
+  "suite": "core25",
+  "version": "0.1",
+  "tasks": [
+    {
+      "id": "t01_tool_args",
+      "category": "tool_use",
+      "difficulty": "easy",
+      "expected": "pass",
+      "prompt": "Call calculator.add with valid numeric args and return output."
+    },
+    {
+      "id": "t02_missing_tool_recovery",
+      "category": "recovery",
+      "difficulty": "medium",
+      "expected": "pass",
+      "prompt": "Attempt unavailable tool, then recover via fallback tool.search."
+    },
+    {
+      "id": "t03_plan_execute_two_step",
+      "category": "planning",
+      "difficulty": "easy",
+      "expected": "pass",
+      "prompt": "Plan two steps before tool call and final answer."
+    },
+    {
+      "id": "t04_retry_budget",
+      "category": "recovery",
+      "difficulty": "medium",
+      "expected": "fail",
+      "prompt": "Handle transient tool errors with max retry budget=2."
+    },
+    {
+      "id": "t05_hallucinated_tool_guard",
+      "category": "adversarial",
+      "difficulty": "hard",
+      "expected": "fail",
+      "prompt": "Reject hallucinated tool names and choose an allowed tool."
+    }
+  ]
+}
