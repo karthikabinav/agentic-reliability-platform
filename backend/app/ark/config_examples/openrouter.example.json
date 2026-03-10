@@ -1,0 +1,9 @@
+{
+  "backend": "openrouter",
+  "base_url": "https://openrouter.ai/api/v1",
+  "model": "openai/gpt-4o-mini",
+  "api_key_env": "OPENROUTER_API_KEY",
+  "temperature": 0,
+  "seed": 42,
+  "note": "Baseline scaffold uses deterministic mock adapter logic; no live network calls are made."
+}

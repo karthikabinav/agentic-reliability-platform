@@ -1,19 +1,23 @@
 import argparse
-import hashlib
 import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from app.ark.adapters import get_adapter
+from app.ark.report import generate_report
 
 
 @dataclass
 class TaskResult:
     task_id: str
     event_type: str
+    tool_call: str
     failure_class: str | None
     passed: bool
     latency_ms: int
+    backend: str
+    model_name: str
 
 
 def _load_suite(suite: str) -> dict:
@@ -24,17 +28,21 @@ def _load_suite(suite: str) -> dict:
 
 
 def _simulate_task(task: dict, model: str) -> TaskResult:
-    seed = hashlib.sha256(f"{model}:{task['id']}".encode()).hexdigest()
-    latency_ms = 100 + int(seed[:2], 16)
-    expected = task.get("expected", "pass")
-    passed = expected == "pass"
-    failure_class = None if passed else "retry_exhaustion"
+    adapter = get_adapter(model)
+    adapter_result = adapter.evaluate_task(task)
+
+    category = task.get("category", "generic")
+    tool_call = task.get("tool_call", f"{category}.simulated")
+
     return TaskResult(
         task_id=task["id"],
-        event_type="task_completed" if passed else "task_failed",
-        failure_class=failure_class,
-        passed=passed,
-        latency_ms=latency_ms,
+        event_type="task_completed" if adapter_result.passed else "task_failed",
+        tool_call=tool_call,
+        failure_class=adapter_result.failure_class,
+        passed=adapter_result.passed,
+        latency_ms=adapter_result.latency_ms,
+        backend=adapter_result.backend,
+        model_name=adapter_result.model_name,
     )
 
 
@@ -44,6 +52,8 @@ def run(suite: str, model: str, out: Path) -> dict:
     ts = datetime.now(timezone.utc).isoformat()
 
     results = [_simulate_task(task, model=model) for task in suite_cfg.get("tasks", [])]
+    backend = results[0].backend if results else "unknown"
+    model_name = results[0].model_name if results else model
 
     traces_path = out / "traces.jsonl"
     with traces_path.open("w", encoding="utf-8") as f:
@@ -53,6 +63,7 @@ def run(suite: str, model: str, out: Path) -> dict:
                 "suite": suite,
                 "model": model,
                 "step_id": r.task_id,
+                "tool_call": r.tool_call,
                 "event_type": r.event_type,
                 "latency_ms": r.latency_ms,
                 "error_type": r.failure_class,
@@ -68,6 +79,8 @@ def run(suite: str, model: str, out: Path) -> dict:
     summary = {
         "suite": suite,
         "model": model,
+        "backend": backend,
+        "model_name": model_name,
         "task_count": len(results),
         "passed": passed,
         "failed": failed,
@@ -88,14 +101,21 @@ def main() -> None:
 
     run_p = sub.add_parser("run", help="Run a benchmark suite")
     run_p.add_argument("--suite", required=True, default="core25")
-    run_p.add_argument("--model", required=True)
+    run_p.add_argument("--model", required=True, help="Model backend spec, e.g. openrouter:openai/gpt-4o-mini or vllm:meta-llama/Llama-3.1-8B-Instruct")
     run_p.add_argument("--out", default="./artifacts")
+
+    report_p = sub.add_parser("report", help="Generate reliability markdown/csv report from artifacts")
+    report_p.add_argument("--in", dest="input_dir", required=True, help="Artifact directory containing summary.json + traces.jsonl")
+    report_p.add_argument("--out", dest="output_dir", default=None, help="Output directory for report files (defaults to --in)")
 
     args = p.parse_args()
 
     if args.command == "run":
         summary = run(suite=args.suite, model=args.model, out=Path(args.out))
         print(json.dumps(summary, indent=2))
+    elif args.command == "report":
+        outputs = generate_report(input_dir=Path(args.input_dir), output_dir=Path(args.output_dir) if args.output_dir else None)
+        print(json.dumps(outputs, indent=2))
 
 
 if __name__ == "__main__":

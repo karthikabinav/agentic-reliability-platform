@@ -23,13 +23,38 @@ uvicorn app.main:app --reload --port 8020
 - Script: `../demo/run_demo.sh`
 
 ## ARK Runner (new)
-Run a local reliability suite and generate artifacts:
+One-command reproducible baseline run:
 ```bash
-ark run --suite core25 --model openrouter/auto --out ./artifacts/core25
+ark run --suite core25 --model openrouter:openai/gpt-4o-mini --out ./artifacts/core25-baseline
 ```
+
+Also supported:
+- `--model vllm:meta-llama/Llama-3.1-8B-Instruct`
+- legacy format `--model openrouter/auto`
+
 Outputs:
 - `traces.jsonl` (step-level telemetry)
 - `summary.json` (Reliability@K summary)
+
+Reproducibility notes:
+- Baseline adapters are deterministic stubs (mocked, no network calls).
+- Task outcomes are seeded by `(backend, model_name, task_id)`.
+- Example backend configs live in:
+  - `app/ark/config_examples/openrouter.example.json`
+  - `app/ark/config_examples/vllm.example.json`
+
+Generate reliability reports from artifacts:
+```bash
+ark report --in ./artifacts/core25 --out ./artifacts/core25
+```
+Outputs:
+- `reliability-report.md` (summary + failure taxonomy + top-3 fixes)
+- `reliability-report.csv` (analysis-friendly per-task rows)
+
+Trace schema v0:
+- Schema file: `backend/app/ark/schemas/trace.schema.v0.json`
+- Each `traces.jsonl` row includes: `ts`, `suite`, `model`, `step_id`, `tool_call`, `event_type`, `latency_ms`, `error_type`, `retry_count`, `final_state`.
+- Validation test: `pytest backend/tests/test_ark_trace_schema.py`
 
 ## Notes
 - SQLite default for MVP.

@@ -28,8 +28,8 @@ Suite: core25 (initial scaffold subset currently 5 tasks)
 ## Reproduce
 ```bash
 cd backend
-python -m app.ark.cli run --suite core25 --model openrouter/auto --out ./artifacts/core25
-cat ./artifacts/core25/summary.json
+python -m app.ark.cli run --suite core25 --model openrouter:openai/gpt-4o-mini --out ./artifacts/core25-baseline
+cat ./artifacts/core25-baseline/summary.json
 ```
 
 ## Notes
