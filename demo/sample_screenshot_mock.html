@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset='utf-8'><title>Agent Reliability Demo (Sample)</title><style>body{font-family:Inter,Arial,sans-serif;background:#0b1020;color:#e7ecff;padding:24px} .card{background:#121a33;border:1px solid #2b3a6b;border-radius:10px;padding:16px;margin:12px 0} pre{white-space:pre-wrap;color:#bfe1ff} .warn{color:#ffd38a}</style></head><body><h1>Agent Reliability Demo — Sample Output</h1><p class='warn'>Illustrative sample screenshot (this environment lacks FastAPI/pip, so live run is blocked).</p><div class='card'><h3>Ingest Result</h3><pre>{
+  "accepted": 4,
+  "rejected": 0,
+  "errors": []
+}</pre></div><div class='card'><h3>Metrics</h3><pre>{
+  "totals": {
+    "events": 4,
+    "failures": 1,
+    "tool_calls": 1,
+    "prompt_events": 2,
+    "modeled_events": 4
+  },
+  "rates": {
+    "failure_rate": 0.25,
+    "prompt_coverage_rate": 0.50,
+    "model_coverage_rate": 1.00
+  }
+}</pre></div><div class='card'><h3>Skill Metrics</h3><pre>{
+  "skills": [
+    {"skill_tag":"debugging","events":3,"failures":1,"failure_rate":0.33},
+    {"skill_tag":"code_generation","events":1,"failures":0,"failure_rate":0.00}
+  ]
+}</pre></div></body></html>

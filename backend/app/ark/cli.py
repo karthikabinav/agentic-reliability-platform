@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from app.ark.adapters import get_adapter
+from app.ark.gate import evaluate_gate
 from app.ark.report import generate_report
 
 
@@ -108,6 +109,11 @@ def main() -> None:
     report_p.add_argument("--in", dest="input_dir", required=True, help="Artifact directory containing summary.json + traces.jsonl")
     report_p.add_argument("--out", dest="output_dir", default=None, help="Output directory for report files (defaults to --in)")
 
+    gate_p = sub.add_parser("gate", help="Evaluate release gate from artifacts")
+    gate_p.add_argument("--in", dest="input_dir", required=True, help="Artifact directory containing summary.json")
+    gate_p.add_argument("--min-reliability", type=float, default=0.8, help="Minimum required Reliability@K")
+    gate_p.add_argument("--max-failed-tasks", type=int, default=5, help="Maximum allowed failed tasks")
+
     args = p.parse_args()
 
     if args.command == "run":
@@ -116,6 +122,14 @@ def main() -> None:
     elif args.command == "report":
         outputs = generate_report(input_dir=Path(args.input_dir), output_dir=Path(args.output_dir) if args.output_dir else None)
         print(json.dumps(outputs, indent=2))
+    elif args.command == "gate":
+        result = evaluate_gate(
+            input_dir=Path(args.input_dir),
+            min_reliability=args.min_reliability,
+            max_failed_tasks=args.max_failed_tasks,
+        )
+        print(json.dumps(result.to_dict(), indent=2))
+        raise SystemExit(0 if result.passed else 1)
 
 
 if __name__ == "__main__":

@@ -36,6 +36,13 @@ Outputs:
 - `traces.jsonl` (step-level telemetry)
 - `summary.json` (Reliability@K summary)
 
+Release gate check (new):
+```bash
+ark gate --in ./artifacts/core25 --min-reliability 0.80 --max-failed-tasks 5
+```
+- Exits `0` on pass, `1` on fail.
+- Usage note: `app/ark/README.eval-gate.md`
+
 Reproducibility notes:
 - Baseline adapters are deterministic stubs (mocked, no network calls).
 - Task outcomes are seeded by `(backend, model_name, task_id)`.
