@@ -1,0 +1,7 @@
+{
+  "name": "agentic-reliability",
+  "version": "0.1.0",
+  "description": "OpenClaw skill for running the Agentic Reliability Platform local demo, report, and release gate.",
+  "author": "agentic-reliability-platform",
+  "tags": ["reliability", "agents", "observability", "openclaw"]
+}

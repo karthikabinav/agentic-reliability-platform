@@ -1,26 +1,42 @@
-# Agentic Reliability Demo (5–7 min)
+# Agentic Reliability Demo
 
-## What this demo proves
-- We log **all prompts**.
-- We log **all tool calls**.
-- We log **which model** produced each step.
-- We can slice reliability by **skill** and identify weakest areas quickly.
-
-## 1) Start API
+## Fast path (<10 min)
 ```bash
 cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .[dev]
+
+cd ../demo
+bash e2e_demo.sh
+```
+
+This runs:
+1. API startup (`uvicorn` on `:8020`)
+2. Telemetry ingest + search + metrics (`run_demo.sh`)
+3. ARK run + report + release gate
+
+Expected snapshot: `expected_output_ascii.txt`
+Mock screenshot: `sample_screenshot_mock.html`
+
+## Manual path
+### 1) Start API
+```bash
+cd backend
+source .venv/bin/activate
 uvicorn app.main:app --port 8020
 ```
 
-## 2) Run demo script
-In a second terminal:
+### 2) Run telemetry script
 ```bash
 cd demo
 bash run_demo.sh
 ```
 
-## 3) Talking points
-- "This is not generic logs. It is reliability telemetry aligned to agent workflow spans."
-- "Coverage metrics show if prompt/model instrumentation is complete."
-- "Skill-level failure rates drive where we intervene first (prompt policy, tool schema, verifier checks)."
-- "Replay queue is wired for deterministic postmortem in P1 worker."
+### 3) Run ARK CLI
+```bash
+cd ../backend
+ark run --suite core25 --model openrouter:openai/gpt-4o-mini --out ./artifacts/core25-baseline
+ark report --in ./artifacts/core25-baseline --out ./artifacts/core25-baseline
+ark gate --in ./artifacts/core25-baseline --min-reliability 0.80 --max-failed-tasks 5
+```

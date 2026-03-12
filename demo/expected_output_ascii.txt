@@ -1,0 +1,27 @@
+$ bash demo/e2e_demo.sh
+== [1/5] Verifying Python env ==
+== [2/5] Starting API server on :8020 ==
+== [3/5] Running telemetry ingestion demo ==
+== Health ==
+{"status":"ok"}
+
+== Ingesting realistic coding-agent telemetry ==
+{"accepted":4}
+
+== Trace view ==
+{"trace_id":"trace_demo_001","events":[...4 events...]}
+
+== Skill slice (debugging) ==
+{"items":[{"failure_class":"tool_contract_mismatch",...}]}
+
+== Tenant metrics (includes prompt/model coverage rates) ==
+{"reliability_at_k":0.84,"prompt_coverage":1.0,"model_coverage":1.0,...}
+
+== [4/5] Running ARK baseline + report + gate ==
+Wrote traces: backend/artifacts/core25-baseline/traces.jsonl
+Wrote summary: backend/artifacts/core25-baseline/summary.json
+Wrote report: backend/artifacts/core25-baseline/reliability-report.md
+GATE PASS reliability=0.84 failed_tasks=4 threshold=0.80
+
+== [5/5] Done ==
+Artifacts: backend/artifacts/core25-baseline
